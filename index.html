@@ -48,39 +48,32 @@
 
 <script>
 	var filter = Array.prototype.filter
-	var blah = function(t) { return Array.from(document.querySelectorAll(t)) }
+	var q = function(t) { return Array.from(document.querySelectorAll(t)) }
 
 	document.querySelector('#filter').addEventListener('keyup', function() {
+		// Display all items
+		q('.item').map( element => { element.style.display = 'initial' })
+		// Filter by search text, all lower case, hide those that dont match
 		var search = this.value.trim().toLowerCase()
-		blah('.item').map( element => {
-			element.style.display = 'initial'
-		})
-		blah('.item').filter( element => {
+		q('.item').filter( element => {
 			return element.textContent.toLowerCase().indexOf(search) < 0
-		}).forEach(element => {
-			element.style.display = 'none'
-		});
+		}).forEach(element => { element.style.display = 'none' });
+		// Open all details
 		document.querySelectorAll('details').forEach(element => {
 			element.open = true
 		})
 	})
 	document.querySelector('#clear').addEventListener('click', function() {
-		Array.from(document.querySelector('#filter')).map( element => {
-			element.value = ''
-		})
-		blah('details').map( element => {
-			element.open = false
-		})
-		blah('.item').map( element => {
-			element.style.display = 'initial'
-		})
+		// Clear filter, restore all items, close details
+		q('#filter').map( element => { element.value = '' })
+		q('details').map( element => { element.open = false })
+		q('.item').map( element => { element.style.display = 'initial' })
 	})
 
 </script>
 
 
 <style>
-
 .container {
 	display: flex;
 	flex-flow: row wrap;
@@ -89,7 +82,6 @@
 	border: 2px solid black;
 	margin: 10px;
 }
-
 summary {
 	color: green;
 	cursor: pointer;
@@ -103,9 +95,7 @@ details > p {
 	margin-top: 15px;
 	margin-left: 15px
 }
-
 </style>
 
 </body>
 </html>
-
