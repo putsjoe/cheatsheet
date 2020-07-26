@@ -1,7 +1,6 @@
 
 <html>
 <body>
-	
 	<h1>Cheatsheet</h1>
 <div id="search">
 	<input id="filter" placeholder="Filter...">
@@ -10,7 +9,6 @@
 </div>
 
 <div class="container">
-
 	<div class="item">
 		<details>
 		<summary>
@@ -47,7 +45,6 @@
 </div>
 
 <script>
-	var filter = Array.prototype.filter
 	var q = function(t) { return Array.from(document.querySelectorAll(t)) }
 	document.getElementById('keyb').checked = true
 
@@ -83,17 +80,18 @@
 
 
 <style>
-body, * {
+/* body, * { */
 	/* border: 1px red solid; */
-}
+/* } */
 .container {
 	display: flex;
 	flex-flow: row wrap;
+	flex-wrap: wrap;
 }
 .item {
 	border: 2px solid black;
 	margin: 10px;
-	width: 30vw;
+	min-width: 20vw;
 }
 summary {
 	color: green;
@@ -115,13 +113,12 @@ h1 {
 	margin-left: 4px;
 }
 #filter {
-	width: 20vw;
+	width: 35vw;
 }
 #filter, #clear {
 	padding: 10px;
 	margin: 6px;
 }
-
 .item, #filter, #clear {
 	border-radius: 10px;
 }
