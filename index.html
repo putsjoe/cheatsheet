@@ -1,0 +1,111 @@
+
+<html>
+<body>
+
+<h1>Cheatsheet</h1>
+
+<input id="filter" placeholder="Filter...">
+<button id="clear">Clear</button>
+
+
+
+<div class="container">
+
+	<div class="item">
+		<details>
+		<summary>
+			This is an example or more detail of the item
+		</summary>
+		<p>
+		This is the cheatsheet item
+		</p>
+		</details>
+	</div>
+
+	<div class="item">
+		<details>
+		<summary>
+			This is more example stuff
+		</summary>
+		<p>
+		Blah Blah
+		</p>
+		</details>
+	</div>
+
+	<div class="item">
+		<details>
+		<summary>
+			This is more example stuff
+		</summary>
+		<p>
+		Blah Blah BA
+		</p>
+		</details>
+	</div>
+
+</div>
+
+<script>
+	var filter = Array.prototype.filter
+	var blah = function(t) { return Array.from(document.querySelectorAll(t)) }
+
+	document.querySelector('#filter').addEventListener('keyup', function() {
+		var search = this.value.trim().toLowerCase()
+		blah('.item').map( element => {
+			element.style.display = 'initial'
+		})
+		blah('.item').filter( element => {
+			return element.textContent.toLowerCase().indexOf(search) < 0
+		}).forEach(element => {
+			element.style.display = 'none'
+		});
+		document.querySelectorAll('details').forEach(element => {
+			element.open = true
+		})
+	})
+	document.querySelector('#clear').addEventListener('click', function() {
+		Array.from(document.querySelector('#filter')).map( element => {
+			element.value = ''
+		})
+		blah('details').map( element => {
+			element.open = false
+		})
+		blah('.item').map( element => {
+			element.style.display = 'initial'
+		})
+	})
+
+</script>
+
+
+<style>
+
+.container {
+	display: flex;
+	flex-flow: row wrap;
+}
+.item {
+	border: 2px solid black;
+	margin: 10px;
+}
+
+summary {
+	color: green;
+	cursor: pointer;
+	font-size: 1.1em;
+	margin: 20px;
+}
+details {
+	margin-left: 20px;
+}
+details > p {
+	margin-top: 15px;
+	margin-left: 15px
+}
+
+</style>
+
+</body>
+</html>
+
