@@ -1,13 +1,13 @@
 
 <html>
 <body>
-
-<h1>Cheatsheet</h1>
-
-<input id="filter" placeholder="Filter...">
-<button id="clear">Clear</button>
-
-
+	
+	<h1>Cheatsheet</h1>
+<div id="search">
+	<input id="filter" placeholder="Filter...">
+	<button id="clear">Clear</button>
+	Capture keys?<input id="keyb" type="checkbox">
+</div>
 
 <div class="container">
 
@@ -49,6 +49,7 @@
 <script>
 	var filter = Array.prototype.filter
 	var q = function(t) { return Array.from(document.querySelectorAll(t)) }
+	document.getElementById('keyb').checked = true
 
 	document.querySelector('#filter').addEventListener('keyup', function() {
 		// Display all items
@@ -70,10 +71,21 @@
 		q('.item').map( element => { element.style.display = 'initial' })
 	})
 
+	document.addEventListener('keydown', function(event) {
+		var s = event.code
+		var ke = document.getElementById('keyb').checked
+		if (s && ke) {
+			document.getElementById('filter').focus()
+		}
+	})
+
 </script>
 
 
 <style>
+body, * {
+	/* border: 1px red solid; */
+}
 .container {
 	display: flex;
 	flex-flow: row wrap;
@@ -81,6 +93,7 @@
 .item {
 	border: 2px solid black;
 	margin: 10px;
+	width: 30vw;
 }
 summary {
 	color: green;
@@ -89,11 +102,28 @@ summary {
 	margin: 20px;
 }
 details {
-	margin-left: 20px;
+	margin: 15px;
 }
 details > p {
 	margin-top: 15px;
 	margin-left: 15px
+}
+h1 {
+	text-align: center;
+}
+#search {
+	margin-left: 4px;
+}
+#filter {
+	width: 20vw;
+}
+#filter, #clear {
+	padding: 10px;
+	margin: 6px;
+}
+
+.item, #filter, #clear {
+	border-radius: 10px;
 }
 </style>
 
