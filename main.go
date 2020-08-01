@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -17,7 +18,7 @@ type cheatSheet struct {
 
 func hello(w http.ResponseWriter, req *http.Request) {
 	var items = []item{
-		item{"Example1", "Blahsnsn more stuff"},
+		item{"Example1", "Blahsnsn stuff"},
 		item{"Example2", "<code>Cheeky Cheeky</code>"},
 	}
 	var sheet = cheatSheet{"First CH", items}
@@ -31,5 +32,6 @@ func hello(w http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/", hello)
 
+	fmt.Println("Serving on port 8000...")
 	http.ListenAndServe(":8000", nil)
 }
