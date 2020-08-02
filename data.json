@@ -1,0 +1,33 @@
+
+[
+    {
+        "title": "Go", 
+        "items": [
+            {
+                "name": "fmt.Println",
+                "text": "This is how you print stuff mainly."
+            },
+            {   "name": "func funcName()",
+                "text": "This is how you start a function"
+            }
+        ]
+    },
+    {
+        "title": "Python", 
+        "items": [
+            {
+                "name": "def",
+                "text": "This is how you start a function"
+            },
+            {
+                "name": "print('Hello world')",
+                "text": "This is how you would print a string"
+            },
+            {
+                "name": "a = \"Blah\"",
+                "text": "this is how you would create a new variable"
+            }
+        ]
+    }
+]
+
