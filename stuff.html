@@ -3,9 +3,13 @@
 <body>
 	<h1>{{ .Title }}</h1>
 <div id="search">
-	<input id="filter" placeholder="Filter...">
+	<input class="inp" id="filter" placeholder="Filter...">
 	<button id="clear">Clear</button>
 	Capture keys?<input id="keyb" type="checkbox">
+</div>
+
+<div class="menu-btn" id="menu">
+	<a href="/">Home</a>
 </div>
 
 <div class="container">
@@ -21,9 +25,19 @@
 	{{ end }}
 </div>
 
+<div id="add" style="text-align: center; width: 70vw; margin: auto;">
+	<h2>Add</h2>
+	<form method="post">
+		<input name="sheet" type="hidden" value="{{ .Title }}">
+		<input name="title"  style="margin-bottom: 10px;" class="inp" placeholder="Title">
+		<button class="inp" style="width: 10vw;">Add</button><br>
+		<textarea name="text" class="" style="padding: 10px" cols="50vw" rows="5px" placeholder="Inner text"></textarea><br>
+	</form>
+</div>
+
 <script>
 	var q = function(t) { return Array.from(document.querySelectorAll(t)) }
-	document.getElementById('keyb').checked = true
+	document.getElementById('keyb').checked = false
 
 	document.querySelector('#filter').addEventListener('keyup', function() {
 		// Display all items
@@ -91,15 +105,20 @@ h1 {
 #search {
 	margin-left: 4px;
 }
-#filter {
+.inp {
 	width: 35vw;
 }
-#filter, #clear {
+.inp, #clear {
 	padding: 10px;
 	margin: 6px;
 }
-.item, #filter, #clear {
+.item, .inp, #clear {
 	border-radius: 10px;
+}
+#menu {
+	position: fixed;
+	top: 10px;
+	right: 30px;
 }
 </style>
 

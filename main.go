@@ -11,7 +11,7 @@ import (
 
 type item struct {
 	Name string
-	Text template.HTML
+	Text string
 }
 
 type cheatSheet struct {
@@ -19,28 +19,19 @@ type cheatSheet struct {
 	Items []item
 }
 
+type data struct {
+	data   []cheatSheet
+	titles []string
+}
+
 func prepData() []cheatSheet {
 	fmt.Println("Loading json data")
 	file, _ := ioutil.ReadFile("data.json")
-
-	// type Item1 struct {
-	// 	Name string `json:"name"`
-	// 	Text string `json:"text"`
-	// }
-
 	var dat []cheatSheet
+
 	if err := json.Unmarshal([]byte(file), &dat); err != nil {
 		panic(err)
 	}
-	// fmt.Printf("%T\n", dat)
-	// for _, d := range dat {
-	// 	fmt.Println(d.Title)
-	// 	for _, i := range d.Items {
-	// 		fmt.Println("  %s - %s \n", i.Name, i.Text)
-	// 	}
-	// }
-	// fmt.Println(" -- --")
-	// fmt.Println(dat)
 
 	return dat
 }
@@ -59,12 +50,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Data struct {
-	data   []cheatSheet
-	titles []string
-}
-
-func (data *Data) showMenu(w http.ResponseWriter, r *http.Request) {
+func (data *data) menu(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("menu.html")
 	var err = t.Execute(w, data.titles)
 	if err != nil {
@@ -81,7 +67,14 @@ func find(a string, list []string) bool {
 	return false
 }
 
-func (data *Data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
+func (data *data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		data.add(
+			r.FormValue("sheet"), r.FormValue("title"), r.FormValue("text"))
+		http.Redirect(w, r, r.Header.Get("Referer"), 302)
+		return
+	}
+
 	sheet := strings.TrimPrefix(r.URL.Path, "/c/")
 	found := find(sheet, data.titles)
 	if !found {
@@ -99,16 +92,45 @@ func (data *Data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (data *data) saveData() {
+	file, _ := json.MarshalIndent(data.data, "", " ")
+
+	if err := ioutil.WriteFile("data.json", file, 0644); err != nil {
+		panic(err)
+	}
+}
+
+func (data *data) add(sheet, title, text string) {
+	if len(text) < 5 || len(title) < 1 {
+		return
+	}
+
+	newitem := item{title, text}
+	for i, c := range data.data {
+		if c.Title == sheet {
+			for _, item := range c.Items {
+				if item.Name == newitem.Name {
+					return
+				}
+			}
+			data.data[i].Items = append(c.Items, newitem)
+			data.saveData()
+			break
+		}
+	}
+}
+
 func main() {
 	dat := prepData()
 	menu := make([]string, len(dat))
 	for _, d := range dat {
 		menu = append(menu, d.Title)
 	}
-	data := &Data{dat, menu}
-	http.HandleFunc("/", hello)
-	http.HandleFunc("/menu", data.showMenu)
+	data := &data{dat, menu}
+
+	http.HandleFunc("/", data.menu)
 	http.HandleFunc("/c/", data.showCheatsheet)
+	http.HandleFunc("/menu", data.menu)
 
 	fmt.Println("Serving on port 8000...")
 	http.ListenAndServe(":8000", nil)
