@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cheatsheet/finder"
+	"cheatsheet/load"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -9,39 +11,17 @@ import (
 	"strings"
 )
 
-type item struct {
-	Name string
-	Text string
-}
-
-type cheatSheet struct {
-	Title string
-	Items []item
-}
-
 type data struct {
-	data   []cheatSheet
+	data   []load.CheatSheet
 	titles []string
 }
 
-func prepData() []cheatSheet {
-	fmt.Println("Loading json data")
-	file, _ := ioutil.ReadFile("data.json")
-	var dat []cheatSheet
-
-	if err := json.Unmarshal([]byte(file), &dat); err != nil {
-		panic(err)
-	}
-
-	return dat
-}
-
 func hello(w http.ResponseWriter, r *http.Request) {
-	var items = []item{
+	var items = []load.Item{
 		{"Example1", "Blahsnsn stuff"},
 		{"Example2", "<code>Cheeky Cheeky</code>"},
 	}
-	var sheet = cheatSheet{"First CH", items}
+	var sheet = load.CheatSheet{"First CH", items}
 
 	t, _ := template.ParseFiles("stuff.html")
 	var err = t.Execute(w, sheet)
@@ -58,25 +38,33 @@ func (data *data) menu(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func find(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
-func (data *data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
+func (data *data) editSheet(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		data.add(
 			r.FormValue("sheet"), r.FormValue("title"), r.FormValue("text"))
 		http.Redirect(w, r, r.Header.Get("Referer"), 302)
 		return
 	}
+	sheet := strings.TrimPrefix(r.URL.Path, "/edit/")
+	found := finder.Find(sheet, data.titles)
+	if !found {
+		http.NotFound(w, r)
+	}
+	for _, c := range data.data {
+		if c.Title == sheet {
+			t, _ := template.ParseFiles("edit.html")
+			var err = t.Execute(w, c)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
 
+}
+
+func (data *data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
 	sheet := strings.TrimPrefix(r.URL.Path, "/c/")
-	found := find(sheet, data.titles)
+	found := finder.Find(sheet, data.titles)
 	if !found {
 		http.NotFound(w, r)
 	}
@@ -105,7 +93,7 @@ func (data *data) add(sheet, title, text string) {
 		return
 	}
 
-	newitem := item{title, text}
+	newitem := load.Item{title, text}
 	for i, c := range data.data {
 		if c.Title == sheet {
 			for _, item := range c.Items {
@@ -121,7 +109,7 @@ func (data *data) add(sheet, title, text string) {
 }
 
 func main() {
-	dat := prepData()
+	dat := load.PrepData()
 	menu := make([]string, len(dat))
 	for _, d := range dat {
 		menu = append(menu, d.Title)
@@ -130,6 +118,7 @@ func main() {
 
 	http.HandleFunc("/", data.menu)
 	http.HandleFunc("/c/", data.showCheatsheet)
+	http.HandleFunc("/edit/", data.editSheet)
 	http.HandleFunc("/menu", data.menu)
 
 	fmt.Println("Serving on port 8000...")

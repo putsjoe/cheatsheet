@@ -10,6 +10,8 @@
 
 <div class="menu-btn" id="menu">
 	<a href="/">Home</a>
+	<br>
+	<a href="/edit/{{ .Title }}">Edit</a>
 </div>
 
 <div class="container">
@@ -23,16 +25,6 @@
 			</details>
 		</div>
 	{{ end }}
-</div>
-
-<div id="add" style="text-align: center; width: 70vw; margin: auto;">
-	<h2>Add</h2>
-	<form method="post">
-		<input name="sheet" type="hidden" value="{{ .Title }}">
-		<input name="title"  style="margin-bottom: 10px;" class="inp" placeholder="Title">
-		<button class="inp" style="width: 10vw;">Add</button><br>
-		<textarea name="text" class="" style="padding: 10px" cols="50vw" rows="5px" placeholder="Inner text"></textarea><br>
-	</form>
 </div>
 
 <script>
