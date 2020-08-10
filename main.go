@@ -16,20 +16,6 @@ type data struct {
 	titles []string
 }
 
-func hello(w http.ResponseWriter, r *http.Request) {
-	var items = []load.Item{
-		{"Example1", "Blahsnsn stuff"},
-		{"Example2", "<code>Cheeky Cheeky</code>"},
-	}
-	var sheet = load.CheatSheet{"First CH", items}
-
-	t, _ := template.ParseFiles("stuff.html")
-	var err = t.Execute(w, sheet)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (data *data) menu(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("menu.html")
 	var err = t.Execute(w, data.titles)
@@ -93,7 +79,7 @@ func (data *data) add(sheet, title, text string) {
 		return
 	}
 
-	newitem := load.Item{title, text}
+	newitem := load.Item{Name: title, Text: text}
 	for i, c := range data.data {
 		if c.Title == sheet {
 			for _, item := range c.Items {
