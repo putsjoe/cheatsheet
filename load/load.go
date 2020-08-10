@@ -70,6 +70,10 @@ func loadDb(cheatsheet []CheatSheet, db *sql.DB) {
 	fmt.Println("Finished")
 }
 
+func loadDatabase(db *sql.DB) {
+	loadDb(PrepData(), db)
+}
+
 func main() {
 	db, err := sql.Open("sqlite3", "./data.sqlite")
 	if err != nil {
@@ -81,5 +85,5 @@ func main() {
 	}
 
 	defer db.Close()
-	loadDb(PrepData(), db)
+
 }

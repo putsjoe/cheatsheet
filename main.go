@@ -1,11 +1,14 @@
 package main
 
 import (
+	"cheatsheet/database"
 	"cheatsheet/load"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -13,6 +16,7 @@ import (
 type data struct {
 	data   []load.CheatSheet
 	titles []string
+	dbase  *database.Datum
 }
 
 func find(a string, list []string) bool {
@@ -58,18 +62,16 @@ func (data *data) editSheet(w http.ResponseWriter, r *http.Request) {
 
 func (data *data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
 	sheet := strings.TrimPrefix(r.URL.Path, "/c/")
-	found := find(sheet, data.titles)
+
+	d, found := data.dbase.GetCheatsheet(sheet)
+
 	if !found {
 		http.NotFound(w, r)
 	}
-	for _, c := range data.data {
-		if c.Title == sheet {
-			t, _ := template.ParseFiles("stuff.html")
-			var err = t.Execute(w, c)
-			if err != nil {
-				panic(err)
-			}
-		}
+	t, _ := template.ParseFiles("stuff.html")
+	var err = t.Execute(w, d)
+	if err != nil {
+		panic(err)
 	}
 
 }
@@ -102,13 +104,32 @@ func (data *data) add(sheet, title, text string) {
 	}
 }
 
+func initDB() *sql.DB {
+	db, err := sql.Open("sqlite3", "./data.sqlite")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		panic("Cant get DB")
+	}
+	return db
+}
+
 func main() {
 	dat := load.PrepData()
 	menu := make([]string, len(dat))
 	for _, d := range dat {
 		menu = append(menu, d.Title)
 	}
-	data := &data{dat, menu}
+
+	datum := &database.Datum{Db: initDB()}
+	// Had this defer in the initDB method, which was closing the connection
+	// when the method returned. Take it it should be here instead rather than
+	// manual closing.
+	defer datum.Db.Close()
+	datum.GetMenu()
+	data := &data{dat, menu, datum}
 
 	http.HandleFunc("/", data.menu)
 	http.HandleFunc("/c/", data.showCheatsheet)
