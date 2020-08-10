@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cheatsheet/finder"
 	"cheatsheet/load"
 	"encoding/json"
 	"fmt"
@@ -14,6 +13,15 @@ import (
 type data struct {
 	data   []load.CheatSheet
 	titles []string
+}
+
+func find(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func (data *data) menu(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +40,7 @@ func (data *data) editSheet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sheet := strings.TrimPrefix(r.URL.Path, "/edit/")
-	found := finder.Find(sheet, data.titles)
+	found := find(sheet, data.titles)
 	if !found {
 		http.NotFound(w, r)
 	}
@@ -50,7 +58,7 @@ func (data *data) editSheet(w http.ResponseWriter, r *http.Request) {
 
 func (data *data) showCheatsheet(w http.ResponseWriter, r *http.Request) {
 	sheet := strings.TrimPrefix(r.URL.Path, "/c/")
-	found := finder.Find(sheet, data.titles)
+	found := find(sheet, data.titles)
 	if !found {
 		http.NotFound(w, r)
 	}
